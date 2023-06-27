@@ -1,0 +1,1 @@
+"0","points(z, dbinom(z, 4, pnorm(36,40,5)), pch=16)"

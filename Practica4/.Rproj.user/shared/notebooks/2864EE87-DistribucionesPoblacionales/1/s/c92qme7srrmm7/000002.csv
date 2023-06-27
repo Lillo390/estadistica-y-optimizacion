@@ -1,0 +1,2 @@
+"0","muestras_diversas<- read.csv(file=""./data/muestras_diversas_simuladas.txt"", header=T,"
+"0","sep = "";"", dec = "","", fileEncoding = ""WINDOWS-1252"")"

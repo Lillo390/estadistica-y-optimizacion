@@ -1,0 +1,13 @@
+"0",""
+"0","dist_norm <- fitdist(superficie, distr = ""norm"")"
+"0","dist_gamma <- fitdist(superficie, distr = ""gamma"")"
+"0",""
+"0","summary(dist_norm)"
+"1","Fitting of the distribution '"
+"1"," "
+"1","norm"
+"1"," "
+"1","' by maximum likelihood 
+"
+"1","Parameters : 
+"

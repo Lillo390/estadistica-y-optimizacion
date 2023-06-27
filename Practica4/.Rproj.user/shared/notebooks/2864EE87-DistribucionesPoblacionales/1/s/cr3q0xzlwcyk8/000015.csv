@@ -1,0 +1,4 @@
+"0","par(mfrow=c(2,3))"
+"0","for (i in 1:5){"
+"0","  hist(Bernoulli[,100+i], xlim=c(0,1))"
+"0","}"

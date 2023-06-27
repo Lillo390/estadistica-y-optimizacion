@@ -1,0 +1,1 @@
+"0","curve(dgamma(x,shape=50*dist_gamma$estimate[[1]],rate=50*dist_gamma$estimate[[2]]),col=""blue"",lwd=2,add=TRUE)"

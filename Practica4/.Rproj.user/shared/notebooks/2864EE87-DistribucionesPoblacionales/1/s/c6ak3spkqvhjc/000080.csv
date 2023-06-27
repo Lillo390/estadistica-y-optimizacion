@@ -1,0 +1,2 @@
+"0","par(mfrow=c(1,2))"
+"0","curve(dnorm(x,250,10), 200, 300, lwd = 2, main = ""Normal(250,10)"")"

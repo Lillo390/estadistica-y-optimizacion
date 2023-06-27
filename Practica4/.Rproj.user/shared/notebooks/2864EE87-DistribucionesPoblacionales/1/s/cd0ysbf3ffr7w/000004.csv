@@ -1,0 +1,4 @@
+"0","media_global<-mean(as.matrix(Bernoulli))"
+"0","desv_global<-sd(as.matrix(Bernoulli))"
+"0","for( i in 1:200 ) { Bernoulli$Media_n10[i] = sum( Bernoulli[i,1:10] )/10 }"
+"0",""

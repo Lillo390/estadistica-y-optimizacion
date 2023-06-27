@@ -1,0 +1,4 @@
+"0","for( i in 1:200 ) { Bernoulli$Media_n25[i] = sum( Bernoulli[i,1:25] )/25}"
+"0","for( i in 1:200 ) { Bernoulli$Media_n50[i] = sum( Bernoulli[i,1:50] )/50 }"
+"0","for( i in 1:200 ) { Bernoulli$Media_n75[i] = sum( Bernoulli[i,1:75] )/75 }"
+"0","for( i in 1:200 ) { Bernoulli$Media_n100[i] = sum( Bernoulli[i,1:100] )/100 }"

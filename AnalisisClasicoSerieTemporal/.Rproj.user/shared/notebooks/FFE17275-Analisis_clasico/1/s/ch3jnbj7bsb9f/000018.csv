@@ -1,0 +1,1 @@
+"0","hist(arima1$residuals, main = ""Histograma de los residuos de SARIMA(1,1,0)(0,1,1)[12]"", ylab=""Frecuencia"", xlab=""Residuos"")"

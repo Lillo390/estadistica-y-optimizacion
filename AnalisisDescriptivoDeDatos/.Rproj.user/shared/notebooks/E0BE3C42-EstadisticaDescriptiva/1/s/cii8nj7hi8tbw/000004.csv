@@ -1,0 +1,2 @@
+"0","dfw <- read.table(file=""./dades/dfw_airline.txt"", header=TRUE, fileEncoding = ""WINDOWS-1252"")"
+"0","dfw"

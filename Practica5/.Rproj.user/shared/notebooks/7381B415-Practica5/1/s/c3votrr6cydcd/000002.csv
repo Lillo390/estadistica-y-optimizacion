@@ -1,0 +1,4 @@
+"0","library(readxl)"
+"0","library(ggplot2)"
+"0","library(car)"
+"0","datwins19 <- read_excel(""./Datos-20221102/datwins19.xlsx"")"

@@ -1,0 +1,2 @@
+"0",""
+"0","hist(muestra2, freq=FALSE,xlim=c(0,500), ylim=c(0, 0.01))"

@@ -1,0 +1,2 @@
+"0",""
+"0","hist(muestramedias50_new,  breaks = 25,freq=FALSE, ylim=c(0, 0.07))"

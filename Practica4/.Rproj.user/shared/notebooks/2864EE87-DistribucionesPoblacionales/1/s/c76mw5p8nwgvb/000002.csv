@@ -1,0 +1,8 @@
+"0","par(mfrow=c(1,2))"
+"0","m<-numeric(2)"
+"0","sd<-numeric(2)"
+"0","for (i in 1:2){"
+"0","  hist(Exponencial[,i], plot = TRUE, freq=FALSE)# Store output of hist function"
+"0","  m[i]<-mean(Exponencial[,i])"
+"0","  sd[i]<-sd(Exponencial[,i])"
+"0","}"

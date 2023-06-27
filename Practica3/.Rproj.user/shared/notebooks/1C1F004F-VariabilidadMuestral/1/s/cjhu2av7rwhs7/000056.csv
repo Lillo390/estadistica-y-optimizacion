@@ -1,0 +1,8 @@
+"0","muestramedias50_new <- rep(NA, 50000)"
+"0","for(i in 1:50000){"
+"0","muestra50 <- sample(superficie, 50)"
+"0","muestramedias50_new[i] <- mean(muestra50)"
+"0"," }"
+"0",""
+"0","par(mfrow = c(1, 2))"
+"0","hist(muestramedias50, breaks = 25, freq=FALSE, ylim=c(0, 0.07))"

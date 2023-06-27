@@ -1,0 +1,2 @@
+"0","for( i in 1:200 ) { Exponencial$Media_n10[i] = sum(Exponencial[i,1:10] )/10}"
+"0","for( i in 1:200 ) { Exponencial$Media_n25[i] = sum( Exponencial[i,1:25] )/25}"

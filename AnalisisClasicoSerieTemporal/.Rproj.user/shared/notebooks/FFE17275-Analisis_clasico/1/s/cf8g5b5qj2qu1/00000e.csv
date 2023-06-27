@@ -1,0 +1,2 @@
+"0","pred <- predict(fitSerie_ALB,n.ahead=12,prediction.interval=TRUE,level=0.95) "
+"0","plot(fitSerie_ALB, pred)"

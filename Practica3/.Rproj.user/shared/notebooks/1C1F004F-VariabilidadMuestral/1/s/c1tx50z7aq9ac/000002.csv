@@ -1,0 +1,4 @@
+"0","#ames<- read.table(file=""./ames.txt"",header=T, sep = "","", dec = ""."")"
+"0","#download.file(""http://www.openintro.org/stat/data/ames.RData"", destfile = #""ames.RData"")"
+"0","set.seed(1)"
+"0","load(""./data/ames.RData"")"

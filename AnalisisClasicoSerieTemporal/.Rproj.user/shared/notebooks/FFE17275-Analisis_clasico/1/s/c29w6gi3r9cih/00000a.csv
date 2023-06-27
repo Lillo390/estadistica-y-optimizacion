@@ -1,0 +1,2 @@
+"0","dd12loginsample <- diff(d12loginsample)"
+"0","plot(dd12loginsample, ylab=expression(Delta[1]^{12}*log(insample)),main=""Paro en Albacete diferenciado a 12 y a 1"")"

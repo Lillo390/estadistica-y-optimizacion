@@ -1,0 +1,7 @@
+"0","ggplot(data=airline, aes(compañia, retrasos_internos, color=""red"")) +"
+"0","ylim(0, 50) +"
+"0","geom_violin() +"
+"0","labs(x=""compania "", y=""porcentaje de retrasos debidos a la compania aerea"")"
+"2","Warning:"
+"2"," Removed 38 rows containing non-finite values (stat_ydensity).
+"

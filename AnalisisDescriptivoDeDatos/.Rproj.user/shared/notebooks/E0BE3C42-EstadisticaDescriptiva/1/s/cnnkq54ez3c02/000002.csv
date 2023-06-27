@@ -1,0 +1,1 @@
+"0","boxplot(retrasos_internos ~ compañia, data=airline, ylim=c(0,50), col=""green"")"

@@ -1,0 +1,5 @@
+"0","sum(lower>mean(superficie) | upper<mean(superficie))/(50)"
+"1","[1]"
+"1"," 0.06"
+"1","
+"

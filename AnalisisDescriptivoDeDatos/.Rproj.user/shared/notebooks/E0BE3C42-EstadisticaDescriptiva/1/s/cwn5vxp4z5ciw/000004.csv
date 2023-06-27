@@ -1,0 +1,2 @@
+"0","# imprime las ultimas filas del banco de datos"
+"0","tail(state, n=5)"

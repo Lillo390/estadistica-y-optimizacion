@@ -1,0 +1,304 @@
+---
+title: "Análisis de una serie temporal."
+author: "Carlos Blom-Dahl Ramos"
+include-before:
+- \usepackage[spanish]{babel}
+- \usepackage[utf8]{inputenc}
+- \usepackage{amsmath,amssymb,amsfonts}
+- \usepackage{color}
+- \usepackage{xcolor}
+- \usepackage{graphicx}
+- \usepackage{eqnarray}
+output:
+  html_document:
+    df_print: paged
+    toc: yes
+    toc_depth: '2'
+    citation_package: natbib
+    number_sections: yes
+  pdf_document:
+    toc: yes
+    toc_depth: '2'
+fontsize: 12pt
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.align = "center",fig.width = 7,message = FALSE,warning = FALSE)
+```
+
+\newpage
+
+
+```{r, echo=FALSE, include=FALSE}
+library(readr)
+library(readxl)
+library(astsa)
+library(forecast)
+library(fma)
+library(zoo)
+library(lubridate)
+library(ggplot2)
+```
+
+# Descripción gráfica de la serie temporal
+
+Vamos a estudiar la serie temporal del paro registrado en la provincia de Albacete entre los años 1977 y 2005, habiéndose tomado una muestra cada mes. Los datos se han obtenido del Instituto Nacional de Estadística (INE).
+
+
+Cargamos y visualicemos la serie de los datos.
+```{r}
+df <- read_excel("SerieBuena.xlsx")
+df<-as.data.frame(df)
+fechas<-seq(as.Date("1977-01-01"), by="month", length=length(df$SERIES))
+df$SERIES <- fechas
+rownames(df) <- df[["SERIES"]]
+df_ALB<-df[c("SERIES", "PARO REGISTRADO. ALBACETE")]
+Serie_ts<-ts(df_ALB$`PARO REGISTRADO. ALBACETE`,start=c(1977,1),end=c(2005,5), frequency=12)
+
+#Visualizamos la serie:
+
+plot(Serie_ts,xlab="Tiempo", ylab="Paro registrado", main="Albacete")
+```
+A partir del gráfico, apreciamos una evolución a largo plazo, es decir, tendencia: a nivel global observamos una tendencia creciente desde 1977 hasta 2005. Así mismo, observamos también un comportamiento cíclico que se repite cada año, es decir, hay estacionalidad, observando un menos paro durante los meses de verano. La longitud del ciclo estacional es $c=12$.
+
+
+A continuación, realizaremos un diagrama de cajas y bigotes agrupando los datos a nivel mensual. Esto nos permite ver la estacionalidad de la serie.
+
+```{r}
+datos.df_ALB <- data.frame(mes= as.numeric(format(df_ALB$SERIES,'%m')), df_ALB)
+datos.df_ALB["SERIES"]<-NULL
+datos.df_ALB$mes<-factor(datos.df_ALB$mes, levels=1:12, labels=c("Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre")) #Ordenamos los meses para que los represente por orden temporal.
+ggplot(datos.df_ALB,aes(x=mes,y=PARO.REGISTRADO..ALBACETE,fill=mes))+
+      geom_boxplot()+ labs(title="Albacete, 1977-2005", x='Mes', y='Paro registrado')
+```
+
+A continuación haremos la gráfica estacional, es decir, dispondremos la información de forma anual.
+```{r}
+ggseasonplot(Serie_ts, year.labels=TRUE, year.labels.left=TRUE) +
+  xlab("Mes")+ylab("Paro") +
+  ggtitle("Albacete")
+```
+Con este gráfico corroboramos el hecho de que existe cierta estacionalidad, ya que vemos como casi todos los años se produce un pico descendente en los meses cercanos al verano.
+
+# Metodología Holt-Winters
+
+## Holt-Winters aditivo
+
+```{r}
+insample <- window(Serie_ts,start=c(1977,1),end=c(2004,05))
+
+outsample <- window(Serie_ts,start=c(2004,6),end=c(2005,5)) 
+
+#Reservamos 2018 para valorar la predicción
+
+fitSerie_ALB<- HoltWinters(insample, seasonal='additive')
+fitSerie_ALB$coefficients
+```
+
+Extraemos los coeficientes $\alpha$, $\beta$ y $\gamma$ del modelo, que son las componentes _level_, tendencial y estacional, respectivamente.
+
+```{r}
+fitSerie_ALB$alpha
+fitSerie_ALB$beta
+fitSerie_ALB$gamma
+```
+
+Visualizamos el ajuste _Holt-Winters_ aditivo.
+
+```{r}
+plot(fitSerie_ALB, ylab='Paro', main='Ajuste HW Aditivo')
+```
+
+A continuación haremos un estudio de bondad de ajuste para validar el modelo. Para ello, consideraremos el primer año para el cálculo de las condiciones iniciales de nuestro problema. 
+```{r}
+insamplecut <- window(insample,start=c(1978,1),end=c(2004,05))
+# El año 1977 se utiliza para calcular las condiciones iniciales. 
+# El ajuste pues se obtiene a partir de enero de enero de 1978.
+fitval<-fitted(fitSerie_ALB)
+rmse <- sqrt(mean((insamplecut-fitval[,1])^2))
+mape <- 100*mean(abs(insamplecut-fitval[,1])/insamplecut)
+```
+
+Podemos concluir que nuestro ajuste es bueno, ya que obtenemos un RMSE=`r rmse` y un MAPE=`r mape`.
+
+## Holt-Winters multiplicativo
+
+```{r}
+fitSerie_ts_mult <- HoltWinters(insample,seasonal="multiplicative")
+fitSerie_ts_mult$coefficients
+```
+
+Extraemos los coeficientes $\alpha$, $\beta$ y $\gamma$ del modelo, que son las componentes _level_, tendencial y estacional, respectivamente.
+```{r}
+fitSerie_ts_mult$alpha
+fitSerie_ts_mult$beta
+fitSerie_ts_mult$gamma
+```
+
+A continuación, ajustaremos el modelo a nuestros datos y haremos una visualización de los mismos.
+```{r}
+fitval_mult <- fitted(fitSerie_ts_mult)  
+
+plot(fitSerie_ts_mult,ylab="paro",main="Ajuste HW multiplicativo")
+```
+
+Por último, revisaremos cómo de bueno es nuestro ajuste calculando el _RMSE_ y el _MAPE_.
+```{r}
+#valoramos la bondad del ajuste
+rmse_mult <- sqrt(mean((insamplecut-fitval_mult[,1])^2))
+mape_mult <- 100*mean(abs(insamplecut-fitval_mult[,1])/insamplecut)
+rmse_mult; mape_mult
+```
+
+## Holt-Winters aditivo aplicado a la serie transformada
+
+Con el fin de eliminar la heterocedasticidad, procedemos a realizar una transformación logarítmica a nuestros datos.
+
+```{r}
+loginsample<-log(insample)
+
+fitSerie_ts_log <- HoltWinters(loginsample,seasonal="additive")
+fitSerie_ts_log$coefficients
+```
+
+Extraemos los coeficientes $\alpha$, $\beta$ y $\gamma$ del modelo, que son las componentes _level_, tendencial y estacional, respectivamente.
+
+```{r}
+fitSerie_ts_log$alpha
+fitSerie_ts_log$beta
+fitSerie_ts_log$gamma
+
+fitval_log <- fitted(fitSerie_ts_log)  
+
+plot(fitSerie_ts_log,ylab="Log(Num Pasajeros)",main="Ajuste HW aditivo a la serie de los logaritmos")
+```
+```{r}
+# Valoramos la bondad del ajuste. Para ello, volvemos previamente a la escala original
+
+fitval_ori <- exp(fitval_log[,1])
+
+rmse_log <- sqrt(mean((insamplecut-fitval_ori)^2))
+mape_log <- 100*mean(abs(insamplecut-fitval_ori)/insamplecut)
+rmse_log; mape_log
+```
+
+El método con menor error de ajuste (tanto RMSE como MAPE) es Holt-Winters con estacionalidad aditiva. Este será, por tanto, el método utilizado para calcular la predicción para el año 2005.
+
+```{r}
+pred <- predict(fitSerie_ALB,12)
+# pred contiene las predicciones puntuales para los 12 meses de 2019
+ts.plot(insample,pred,lty=1:2)
+```
+```{r}
+# Valoramos la capacidad predictiva del método
+
+rmse_pred <- sqrt(mean((outsample-pred)^2))
+mape_pred <- 100*mean(abs(outsample-pred)/outsample)
+rmse_pred;mape_pred
+```
+Podemos también representar gráficamente los valores reales de 2019 que habíamos reservado junto con la predicción puntual:
+
+```{r}
+plot(pred, col="red",xaxt="n",xlab="05/2004-05/2005")
+points(outsample,pch=19)
+```
+
+y calcular el intervalo de predicción al 95%:
+
+```{r}
+pred <- predict(fitSerie_ALB,n.ahead=12,prediction.interval=TRUE,level=0.95) 
+plot(fitSerie_ALB, pred)
+```
+
+# Análisis de la serie mediante la metodología Box-Jenkins.
+
+Para eliminar la heterocedasticidad asociada a la serie, trabajaremos con una transformación logarítmica de la misma. El primer paso que debemos de realizar el suprimir la estacionalidad de la serie, con el fin de convertirla en estacionaria. Para ello, como los datos se han tomado de forma mensual, calculamos una diferencia con un retraso de 12 ($D=1$).
+
+```{r}
+d12loginsample <- diff(loginsample,lag=12, differences=1)
+plot(d12loginsample, ylab=expression(Delta^{12}*log(insample)), main="Paro en Albacete diferenciado a 12")
+```
+
+A continuación, para lograr la estacionariedad debemos de eliminar la tendencia, por lo que aplicamos una diferencia con un retraso de 1 ($d=1$).
+
+```{r}
+dd12loginsample <- diff(d12loginsample)
+plot(dd12loginsample, ylab=expression(Delta[1]^{12}*log(insample)),main="Paro en Albacete diferenciado a 12 y a 1")
+```
+
+Podemos asumir que la serie diferenciada con $d=1$ y $D=1$ ya es estacionaria (ruido blanco). Pasamos a examinar el correlograma (ACF) y el correlograma parcial (PACF):
+
+```{r}
+acf(dd12loginsample,lag.max=50, main="Paro en Albacete diferenciado a 12 y a 1")
+pacf(dd12loginsample,lag.max=50, main="Paro en Albacete diferenciado a 12 y a 1")
+```
+
+En el ACF podemos observar un único palo significativo situado a una distancia de 12, justo nuestra frecuencia estacional. Por lo tanto, establecemos que $Q=1$. También observamos que a nivel intraperiodo no hay apenas significatividad en el ACF, por lo que establecemos $q=0$. En cuanto al PACF, en las frecuencias estacionales observamos un decrecimiento lento, sin embargo el primer palo es más significativo que el resto, por lo que proponemos $P=0$ o $P=1$. Por último, a nivel intraperiodo podemos decantarnos por $p=1$. Probaremos ambos modelos para realizar la predicción, junto con el que nos sea propuesto por la función `auto.arima`.
+
+```{r}
+arima1<-arima(x = loginsample, order = c(1, 1, 0), seasonal = list(order = c(0, 1, 1), period = 12))
+
+arima2<-arima(x = loginsample, order = c(1, 1, 0), seasonal = list(order = c(1, 1, 1), period = 12))
+
+arima3<-auto.arima(loginsample)
+
+arima1_pred<-forecast(arima1, 12)
+arima2_pred<-forecast(arima2,12)
+arima3_pred<-forecast(arima3,12)
+```
+
+A continuación, valoraremos la bondad de ajuste de nuestro modelo, teniendo en cuenta que antes será necesario deshacer la transformación logarítmica hecha anteriormente. Para ello nos valdremos de la función exponencial.
+
+```{r}
+# Valoramos la bondad de ajuste
+rmse_pred1 <- sqrt(mean((outsample-exp(as.numeric(arima1_pred$mean)))^2))
+mape_pred1 <- 100*mean(abs(outsample-exp(as.numeric(arima1_pred$mean)))/outsample)
+rmse_pred1;mape_pred1
+
+rmse_pred2 <- sqrt(mean((outsample-exp(as.numeric(arima2_pred$mean)))^2))
+mape_pred2 <- 100*mean(abs(outsample-exp(as.numeric(arima2_pred$mean)))/outsample)
+rmse_pred2;mape_pred2
+
+rmse_pred3 <- sqrt(mean((outsample-exp(as.numeric(arima3_pred$mean)))^2))
+mape_pred3 <- 100*mean(abs(outsample-exp(as.numeric(arima3_pred$mean)))/outsample)
+rmse_pred3;mape_pred3
+
+
+plot(exp(arima1_pred$mean), col="red",xaxt="n",xlab="05/2004-05/2005", ylab="Paro en Albacete", main="SARIMA(1,1,0)(0,1,1)[12]")
+points(outsample,pch=19)
+
+plot(exp(arima2_pred$mean), col="red",xaxt="n",xlab="05/2004-05/2005",ylab="Paro en Albacete",main="SARIMA(1,1,0)(1,1,1)[12]")
+points(outsample,pch=19)
+
+plot(exp(arima3_pred$mean), col="red",xaxt="n",xlab="05/2004-05/2005",ylab="Paro en Albacete",main="SARIMA(2,1,1)(2,1,1)[12]")
+points(outsample,pch=19)
+```
+
+Como podemos observar, el modelo que mejores predicciones nos ha proporcionado ha sido el _SARIMA(1,1,0)(0,1,1)[12]_. 
+
+Revisamos que los residuos de este modelo sean ruido blanco.
+```{r}
+acf(arima1$residuals,main="Residuos SARIMA(1,1,0)(0,1,1)[12]")
+pacf(arima1$residuals, main="Residuos SARIMA(1,1,0)(0,1,1)[12]")
+```
+
+Como podemos observar, en el ACF no se observa ningún tipo de relación entre los residuos, y en PACF, pese a que existen palos significativos entre medias, no parecen atender a ninguna norma, ni decrecen lentamente, ni hay significatividad regular.
+
+Revisaremos a continuación una gráfica de los mismos para poder determinar que son estacionarios.
+
+```{r}
+plot(arima1$residuals, ylab="Residuos", main="SARIMA(1,1,0)(0,1,1)[12]")
+```
+
+Como podemos apreciar, nuestros residuos son en efecto ruido blanco.
+
+Por último, comprobaremos que se distribuyen de forma normal visualizando su histograma.
+
+```{r}
+hist(arima1$residuals, main = "Histograma de los residuos de SARIMA(1,1,0)(0,1,1)[12]", ylab="Frecuencia", xlab="Residuos")
+lines(density(arima1$residuals), lwd = 2, col = 'red')
+```
+
+Como podemos observar,  los residuos se distribuyen como una normal de media 0 y desviación típica `r sd(arima1$residuals)`.
+
+

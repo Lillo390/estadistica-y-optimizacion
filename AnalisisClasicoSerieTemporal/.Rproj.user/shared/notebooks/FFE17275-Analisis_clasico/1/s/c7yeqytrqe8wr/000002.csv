@@ -1,0 +1,21 @@
+"0","df <- read_excel(""SerieBuena.xlsx"")"
+"1","[38;5;252mNew names:
+[36m*[38;5;252m [38;5;252m`PARO REGISTRADO. BALEARES`[38;5;252m -> [38;5;252m`PARO REGISTRADO.[38;5;252m
+  [38;5;252mBALEARES...8`[38;5;252m
+[36m*[38;5;252m [38;5;252m`PARO REGISTRADO. RIOJA, LA`[38;5;252m -> [38;5;252m`PARO REGISTRADO.[38;5;252m
+  [38;5;252mRIOJA, LA...27`[38;5;252m
+[36m*[38;5;252m [38;5;252m`PARO REGISTRADO. BALEARES`[38;5;252m -> [38;5;252m`PARO REGISTRADO.[38;5;252m
+  [38;5;252mBALEARES...55`[38;5;252m
+[36m*[38;5;252m [38;5;252m`PARO REGISTRADO. RIOJA, LA`[38;5;252m -> [38;5;252m`PARO REGISTRADO.[38;5;252m
+  [38;5;252mRIOJA, LA...68`[38;5;252m[39m
+"
+"0","df<-as.data.frame(df)"
+"0","fechas<-seq(as.Date(""1977-01-01""), by=""month"", length=length(df$SERIES))"
+"0","df$SERIES <- fechas"
+"0","rownames(df) <- df[[""SERIES""]]"
+"0","df_ALB<-df[c(""SERIES"", ""PARO REGISTRADO. ALBACETE"")]"
+"0","Serie_ts<-ts(df_ALB$`PARO REGISTRADO. ALBACETE`,start=c(1977,1),end=c(2005,5), frequency=12)"
+"0",""
+"0","#Visualizamos la serie:"
+"0",""
+"0","plot(Serie_ts,xlab=""Tiempo"", ylab=""Paro registrado"", main=""Albacete"")"

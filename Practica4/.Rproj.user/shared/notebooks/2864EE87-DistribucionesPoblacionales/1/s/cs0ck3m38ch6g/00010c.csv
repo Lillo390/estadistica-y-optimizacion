@@ -1,0 +1,4 @@
+"0",""
+"0","hist_info2 <- hist(muestras_diversas$MUESTRA2, plot = FALSE)# Store output of hist function"
+"0","hist_info2$density<- hist_info2$counts/sum(hist_info2$counts)*100    # Compute density values "
+"0","plot(hist_info2, freq = FALSE,ylab=""Porcentaje"") "

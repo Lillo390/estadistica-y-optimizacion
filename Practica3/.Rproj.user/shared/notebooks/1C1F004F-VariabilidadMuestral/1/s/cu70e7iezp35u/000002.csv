@@ -1,0 +1,2 @@
+"0","superficie <- ames$Gr.Liv.Area*0.09290304"
+"0","precio <- ames$SalePric"

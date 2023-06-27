@@ -1,0 +1,5 @@
+"0","datos.df_ALB <- data.frame(mes= as.numeric(format(df_ALB$SERIES,'%m')), df_ALB)"
+"0","datos.df_ALB[""SERIES""]<-NULL"
+"0","datos.df_ALB$mes<-factor(datos.df_ALB$mes, levels=1:12, labels=c(""Enero"",""Febrero"",""Marzo"",""Abril"",""Mayo"",""Junio"",""Julio"",""Agosto"",""Septiembre"",""Octubre"",""Noviembre"",""Diciembre"")) #Ordenamos los meses para que los represente por orden temporal."
+"0","ggplot(datos.df_ALB,aes(x=mes,y=PARO.REGISTRADO..ALBACETE,fill=mes))+"
+"0","      geom_boxplot()+ labs(title=""Albacete, 1977-2005"", x='Mes', y='Paro registrado')"

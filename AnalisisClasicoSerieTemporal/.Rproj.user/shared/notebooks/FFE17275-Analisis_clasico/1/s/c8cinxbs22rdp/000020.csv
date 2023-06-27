@@ -1,0 +1,1 @@
+"0","pacf(arima1$residuals, main=""Residuos SARIMA(1,1,0)(0,1,1)[12]"")"

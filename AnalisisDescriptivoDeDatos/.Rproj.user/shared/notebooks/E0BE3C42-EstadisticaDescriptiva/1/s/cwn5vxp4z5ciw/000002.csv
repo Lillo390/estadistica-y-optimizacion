@@ -1,0 +1,2 @@
+"0","#imprime las primeras 10 filas del banco de datos"
+"0","head(state, n=10)"

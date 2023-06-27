@@ -1,0 +1,1 @@
+"0","plot(arima1$residuals, ylab=""Residuos"", main=""SARIMA(1,1,0)(0,1,1)[12]"")"

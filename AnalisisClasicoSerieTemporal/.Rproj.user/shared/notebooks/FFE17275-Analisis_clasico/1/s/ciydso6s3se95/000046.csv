@@ -1,0 +1,2 @@
+"0",""
+"0","plot(exp(arima3_pred$mean), col=""red"",xaxt=""n"",xlab=""05/2004-05/2005"",ylab=""Paro en Albacete"",main=""SARIMA(2,1,1)(2,1,1)[12]"")"

@@ -1,0 +1,6 @@
+"0","insamplecut <- window(insample,start=c(1978,1),end=c(2004,05))"
+"0","# El año 1977 se utiliza para calcular las condiciones iniciales. "
+"0","# El ajuste pues se obtiene a partir de enero de enero de 1978."
+"0","fitval<-fitted(fitSerie_ALB)"
+"0","rmse <- sqrt(mean((insamplecut-fitval[,1])^2))"
+"0","mape <- 100*mean(abs(insamplecut-fitval[,1])/insamplecut)"

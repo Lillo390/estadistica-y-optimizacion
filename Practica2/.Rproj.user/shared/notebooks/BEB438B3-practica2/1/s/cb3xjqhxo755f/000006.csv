@@ -1,0 +1,4 @@
+"0"," x <- 0:5"
+"0"," x <- rep(x, rep(2, length(x)))"
+"0","    plot(x[-1], pbinom(x, 5,0.2)[-length(x)], xlab=""x"", ylab=""probabilidad"","
+"0","     main=""Función de distribución, Bi(5,0.2)"", type=""l"")"

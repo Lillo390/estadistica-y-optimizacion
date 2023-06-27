@@ -1,0 +1,3 @@
+"0","Exponencial<- read.csv(""./data/25_muestras_exponencial.txt"", sep="";"", dec="","")"
+"0","media_global<-mean(as.matrix(Exponencial))"
+"0","desv_global<-sd(as.matrix(Exponencial))"

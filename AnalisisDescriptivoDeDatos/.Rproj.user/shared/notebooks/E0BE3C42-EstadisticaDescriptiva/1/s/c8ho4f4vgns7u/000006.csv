@@ -1,0 +1,2 @@
+"0","asesinatos<-state[[""Murder.Rate""]]"
+"0","hist(asesinatos, col=""green"", breaks=12, freq=FALSE, main=""Número de asesinatos por 100 mil habitantes "")"

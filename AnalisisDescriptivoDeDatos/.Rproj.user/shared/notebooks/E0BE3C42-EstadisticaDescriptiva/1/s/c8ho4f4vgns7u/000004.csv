@@ -1,0 +1,2 @@
+"0","poblacion<-state[[""Population""]]"
+"0","hist(poblacion, col=""red"", breaks=12, freq=TRUE, main=""Población de los estados de USA"")"

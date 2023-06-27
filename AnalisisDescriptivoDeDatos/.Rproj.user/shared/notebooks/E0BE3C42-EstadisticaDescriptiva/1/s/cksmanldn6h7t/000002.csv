@@ -1,0 +1,2 @@
+"0","state<-read.csv(file=""./dades/state.csv"", header=T, sep = "","", dec = ""."", fileEncoding = ""WINDOWS-1252"")"
+"0","state"

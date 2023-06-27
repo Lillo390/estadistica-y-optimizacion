@@ -1,0 +1,272 @@
+---
+title: "Estadística Descriptiva"
+output: pdf_document
+---
+<!-- No funciona el Rmd en pdf perqu? n'hi han dintre del comandamends de R alguna ? de compa?ia (error en inputenc latex a solventar) -->
+<!-- Crear el archivo cómo UTF-8 y añadir en la lectura de los datos -->
+<!-- *fileEncoding=WINDOWS-1252* -->
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Análisis exploratorio de datos categóricos y binarios
+
+Para estudiar numéricamente los datos categóricos, es suficiente con la proporción, porcentajes y frecuencias en la que ocurre cada una de las categorías. 
+El siguiente ejemplo muestra el porcentaje de vuelos cancelados según la causa en el aeropuerto de Dallas/fort Worth desde 2010.
+
+Cargamos en primer lugar algunas librerías que nos serán de utilidad:
+```{r dfw, warning=FALSE, results='hide'}
+#library(ascii)
+library(stats)
+library(corrplot)
+library(descr)
+library(dplyr)
+library(ggplot2)
+library(hexbin)
+library(matrixStats)
+library(tidyr)
+library(vioplot)
+```
+
+Veamos pues cómo cargar el conjunto de datos, ver la dimensión, el nombre de las variables:
+```{r dfw2, warning=FALSE, results='hide'}
+dfw <- read.table(file="./dades/dfw_airline.txt", header=TRUE, fileEncoding = "WINDOWS-1252")
+dfw
+dim(dfw)
+names(dfw)
+```
+
+A continuación creamos un nuevo banco de datos *tabla* en la que guardamos las frecuencias y las ordenamos en orden alfabético:
+```{r dfw3, warning=FALSE, results='hide'}
+frecuencia<-dfw[["Frecuencia"]]
+tipo<-dfw[["Tipo"]]
+tapply(frecuencia, tipo,sum)
+tabla<-tapply(frecuencia, tipo, sum)
+barplot(tabla)
+barplot(tabla, col="cyan", main="Tipo de retraso en los vuelos del aeropuerto de Dallas")
+barplot(tabla/sum(frecuencia), col="green", main="Tipo de retraso en los vuelos del aeropuerto de Dallas")
+```
+
+Si queremos reordenar los niveles de un factor, partimos de una variable que está resordenada:
+```{r reorder1, warning=FALSE}
+# Create a factor with the wrong order of levels
+sizes <- factor(c("small", "large", "large", "small", "medium"))
+sizes
+```
+
+los niveles se pueden especificar como:
+```{r reorder2, warning=FALSE}
+sizes <- factor(sizes, levels = c("small", "medium", "large"))
+sizes
+```
+
+Para reordenar los niveles utilizar el comando *ordered*:
+```{r reorder3, warning=FALSE}
+sizes <- ordered(c("small", "large", "large", "small", "medium"))
+sizes <- ordered(sizes, levels = c("small", "medium", "large"))
+sizes
+```
+
+## Análisis exploratorio de datos cuantitativos
+
+El banco de datos que usaremos para este apartado es el del fichero *state.csv*, que  contiene los datos de población y tasa de asesinatos (número de asesinatos por cada 100000 personas y año) en los diferentes estados de USA. 
+
+En primer lugar leemos el fichero de datos:
+
+```{r stateread, warning=FALSE, results='hide'}
+state<-read.csv(file="./dades/state.csv", header=T, sep = ",", dec = ".", fileEncoding = "WINDOWS-1252")
+state
+```
+Si queremos conocer el tipo de objeto, la dimensión del banco de datos, el nombre de las variables (columnas), una pequeña vista de los datos con infomación relevante (esa información mejor vista), estas son las funciones del R que podemos usar respectivamente:
+
+```{r state1}
+# tipo de objeto
+class(state)
+# dimension del banco de datos
+dim(state)
+# nombres de las columnas/variables
+names(state)
+# pequena vista de los datos con informacion relevante
+str(state)
+# igual que la funcion anterior pero un poco mejor
+glimpse(state)
+```
+
+Las siguientes instrucciones nos permiten obtener parte del banco de datos:
+
+
+```{r state2}
+#imprime las primeras 10 filas del banco de datos
+head(state, n=10)
+# imprime las ultimas filas del banco de datos
+tail(state, n=5)
+state[1,3]
+state[1, ]
+state[, 1]
+```
+
+### Medidas de Localización
+
+Una parte importante de la exploración de datos cuantitativos es obtener valores que resuman la parte central en la que se sitúan los datos, que representaremos por
+$\{x_1, x_2, ... , x_n\}$. 
+
+Media, media recortada, mediana, media ponderada y mediana ponderada muestrales:
+
+```{r state3}
+mean(state[["Population"]])
+mean(state[["Population"]], trim=0.1)
+median(state[["Population"]])
+weighted.mean(state[["Murder.Rate"]], w=state[["Population"]])
+library(matrixStats)
+weightedMedian(state[["Murder.Rate"]], w=state[["Population"]])
+```
+
+### Medidas de dispersión
+
+Cálculo del mánimo, míximo, rango, desviación típica ($sd$), desviación media absoluta que se define como: 
+$$ mad = \frac{\sum_{i=1}^{i=n}|x_i-\bar{x}|}{n}$$,
+el rango intercuartílico ($IQR=Q_3-Q_1$) y cuantiles muestrales.
+```{r state4}
+min(state[["Population"]])
+max(state[["Population"]])
+range(state[["Population"]])
+sd(state[["Population"]])
+IQR(state[["Population"]])
+mad(state[["Population"]])
+quantile(state[["Murder.Rate"]], p=c(0.05, 0.25, 0.50, 0.75, 0.95))
+```
+
+Resumen de la descripción de los datos
+```{r state5}
+summary(state)
+```
+
+### Visualización de los datos cuantitativos
+
+Vamos a ver la tabla de frecuencias, histograma, diagrama de tallo y hojas y diagrama de cajas:
+```{r visualstate}
+breaks<- seq(from=min(state[["Population"]]), to=max(state[["Population"]]), length=11)
+pop_freq <- cut(state[["Population"]], breaks=breaks, right=TRUE, include.lowest=TRUE)
+table(pop_freq)
+hist(state[["Population"]], breaks=breaks)
+poblacion<-state[["Population"]]
+hist(poblacion, col="red", breaks=12, freq=TRUE, main="Población de los estados de USA")
+asesinatos<-state[["Murder.Rate"]]
+hist(asesinatos, col="green", breaks=12, freq=FALSE, main="Número de asesinatos por 100 mil habitantes ")
+lines(density(asesinatos), lwd=3, col="blue")
+stem(asesinatos)
+boxplot(asesinatos, col="cyan", main="Número de asesinatos por cada 100 mil habitantes")
+boxplot(poblacion, col="cyan", main="Población de los estados de USA")
+```
+
+### Explorando dos o más muestras 
+
+El análisis de datos en muchos proyectos involucra examinar la correlación entre variables. Dos variables $X$ e $Y$ decimos que están correladas si valores altos de $X$ van a valores altos de $Y$, y valores bajos de $X$ van a valores bajos de $Y$. Si valores altos de $X$ van a valores bajos de $Y$, y viceversa, diremos que las variables están correladas negativamente. 
+
+El *coeficiente de correlación* nos mide la correlación entre dos variables, es una medida adimensional entre $-1$ y $1$:
+$r=\frac{\sum_{i=1}^{n}(x_i-\bar{x})(y_{i}-\bar{y})}{(n-1)s_{x}s_{y}}$
+
+Muestras de variables cuantitativas. Datos de la grasa corporal y medidas de los pliegues del bíceps, tríceps y muslo de un grupo de 20 mujeres.
+```{r body1}
+body.fat<-read.table("./dades/body.fat.txt", header=T)
+dim(body.fat)
+attach(body.fat)
+names(body.fat)
+cor(body.fat)
+plot(triceps, grasacorporal)
+plot(triceps, grasacorporal, col="red", xlim=c(10,35), ylim=c(10,30), pch=16)
+library(corrplot)
+corrplot(cor(body.fat), method="ellipse")
+```
+
+Datos de la tasa de impuestos, dimensión y códigos zip de 432,693 propiedades residenciales de King County, Washington.
+```{r tax1}
+kc_tax<- read.table("./dades/kc_tax.txt", sep = ",", header=T )
+dim(kc_tax)
+names(kc_tax)
+head(kc_tax, n=10)
+kc_tax0 <- subset(kc_tax, tasa_impuestos < 750000 & dimension>100 &
+dimension<3500)
+nrow(kc_tax0)
+```
+Gráficos que muestran la relación entre dos variables numéricas:
+
+- *scatterplot* (Nube de puntos), 
+
+- *Hexagonal binning plot*, las gráficas *scatterplot* están bien cuando hay un número relativamente pequeño de datos. Cuando hay muchos datos los *scatterplots* no tienen sentido porque son demasiado densas. En el Hexagonal binning en lugar de pintar puntos, se agrupan las observaciones en contenedores hezagonales y se pintan los hexágonos en un color indicando el número de observaciones en cada contenedor.
+
+En el gráfico se ve clara la relación entre la dimensión y la tasa de impuestos. Una interesante característica escondida, es la segunda nube arriba de la primera nube más marcada, indicando las residencias con la misma dimensión pero con una tasa de impuestos mayor. Característica que se ve más claramente en el siguiente gráfico. 
+
+- *Contour plot* (diagrama de puntos con curvas de nivel), figura que muestra la densidad de dos variables numéricas como en un mapa topográfico. Mismas conclusiones que en el hexagonal binninb, se ve más claramente el segundo pico. 
+
+- *Violin plots*, similar al boxplot pero mostrando la estimación de la densidad, en el que se pueden apreciar matices no apreciables en el boxplot. Para combinar un violin plot con un boxplot añadir *geom-boxplot* al gráfico. 
+
+```{r tax2}
+plot(kc_tax0$dimension, kc_tax0$tasa_impuestos)
+library(ggplot2)
+ggplot(kc_tax0, (aes(x=dimension, y=tasa_impuestos))) +
+stat_binhex(colour="blue") +
+theme_bw() +
+scale_fill_gradient(low="white", high="blue") +
+labs(x="dimensi?n (pies cuadrados)", y="tasa de impuestos")
+ggplot(kc_tax0, (aes(x=dimension, y=tasa_impuestos))) +
+stat_binhex(colour="white") +
+theme_bw() +
+geom_point(alpha=0.1) +
+geom_density2d(colour="white") +
+scale_fill_gradient(low="white", high="blue") +
+labs(x="dimensión (pies cuadrados)", y="tasa de impuestos")
+```
+
+## Datos de variables cuantitativas y categóricas
+
+### Datos de dos variables categóricas
+
+Datos de préstamos de una determinada institución
+```{r loan1}
+loan<- read.table("./dades/loan.txt", sep = ",", header=T )
+dim(loan)
+names(loan)
+```
+
+Imprime las primeras 10 filas del fichero
+```{r loan2}
+head(loan, n=10)
+library(descr)
+x_tab<-CrossTable(loan$home_, loan$status, prop.c=FALSE, prop.chisq=FALSE, prop.t=FALSE)
+x_tab
+```
+
+Datos del $\%$ de retrasos debidos a diferentes causas en los vuelos que aterrizan en el aeropuerto de Dallas-Fort Worth
+
+```{r airline}
+airline<- read.table("./dades/airline_delays.txt", sep = ",", header=T, fileEncoding ="WINDOWS-1252")
+dim(airline)
+names(airline)
+```
+
+Box plot:
+```{r boxplot}
+boxplot(retrasos_internos ~ compañia, data=airline, ylim=c(0,50), col="green")
+```
+
+Violin plot
+```{r violin}
+ggplot(data=airline, aes(compañia, retrasos_internos, color="red")) +
+ylim(0, 50) +
+geom_violin() +
+labs(x="compania ", y="porcentaje de retrasos debidos a la compania aerea")
+```
+
+Visualización de muchas variables
+```{r muchasvbles}
+ggplot(subset(kc_tax0, codigo_zip %in% c(98188, 98105, 98108, 98126)),
+aes(x=dimension, y=tasa_impuestos)) +
+stat_binhex(colour="white") +
+theme_bw() +
+scale_fill_gradient( low="white", high="blue") +
+labs(x="dimension (pies cuadrados)", y="tasa impuestos") +
+facet_wrap("codigo_zip")
+```

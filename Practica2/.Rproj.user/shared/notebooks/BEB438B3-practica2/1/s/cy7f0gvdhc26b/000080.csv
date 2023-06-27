@@ -1,0 +1,2 @@
+"0",""
+"0","plot(zlargo[-1], pbinom(zlargo, size=4, prob=pnorm(36,40,5))[-length(zlargo)], ylim=c(0,1), ylab="""", main=""Distribución de Bin(4,0.2118554)"", type=""l"")"

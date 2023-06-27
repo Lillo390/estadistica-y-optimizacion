@@ -1,0 +1,3 @@
+"0","pred <- predict(fitSerie_ALB,12)"
+"0","# pred contiene las predicciones puntuales para los 12 meses de 2019"
+"0","ts.plot(insample,pred,lty=1:2)"

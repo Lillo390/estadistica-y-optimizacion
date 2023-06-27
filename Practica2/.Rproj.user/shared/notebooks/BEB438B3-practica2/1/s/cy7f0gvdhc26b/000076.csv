@@ -1,0 +1,5 @@
+"0","x<-seq(20, 60, 0.1)"
+"0","z<-0:4"
+"0","zlargo<-rep(z, rep(2, length(z)))"
+"0",""
+"0","plot(x, dnorm(x, mean=40, sd=5), type=""l"", ylim=c(0,1), ylab="""", col=""red"", main=""Densidad de N(40,5)"")"

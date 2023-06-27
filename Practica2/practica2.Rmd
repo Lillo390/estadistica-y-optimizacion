@@ -1,0 +1,167 @@
+---
+title: 'Práctica 2: Probabilidad, muestras y población '
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# 1. Variables aleatorias con distribución conocida
+
+En **R** existen comandos para el cálculo de probabilidades con función de distribución conocida. En el caso de las distribuciones discretas que hemos visto, tenemos la distribución binomial $binom$, Poisson $pois$ y Geométrica $geom$. Entre algunas de las funciones de distribuciones contínuas se encuentran la distribución Normal $norm$, t-Student $t$, $\chi^2$ $chisq$, F-Snedecor $f$. 
+
+En todas ellas hay que añadir un prefijo dependiendo de lo que se desee trabajar: 
+\begin{itemize}
+\item[] $d$: para funciones de probabilidad,
+\item[] $p$: cuando se trata de funciones de distribución, 
+\item[] $r$: para generar valores de la distribución elegida, y 
+\item[] $q$: para percentiles.
+\end{itemize}
+
+Por ejemplo, si dada una variable aleatoria $X_1 \sim Po(\lambda=2)$ queremos calcular $P(X_1= 4)$, 
+```{r poisson}
+dpois(4,2)
+```
+Si en cambio, dada la variable aleatoria $X_2 \sim Bi(n=5,p=0.25)$, queremos conocer la $P(X_2\leq 2)$ 
+```{r binom}
+pbinom(2,size=5,prob=0.25)
+```
+
+Para calcular una muestra aleatoria de una $N(\mu=22,\sigma=7)$ y dibujarla tendríamos que hacer: 
+
+```{r norm, results='hide', fig.show='hide'}
+sample10<-rnorm(10,22,7)
+sample10
+hist(sample10,freq = FALSE, col = "blue")
+```
+
+Con ayuda del **R** podemos calcular las gráficas de las funciones de probabilidad y de distribución. Por ejemplo, para $X\sim Bi(5,0.2)$:
+
+  - Función de probabilidad
+```{r fprobbin, results='hide', fig.show='hide'}
+x <- 0:5
+plot(x, dbinom(x, 5,0.2), xlab="x", ylab="probabilidad",
+     main="Función de probabilidad, Bi(5,0.2)", type="h")
+  points(x, dbinom(x, 5, 0.2), pch=16)
+abline(h=0, col="gray")
+remove(x)
+```
+  - Función de distribución: 
+```{r fdistbi, results='hide', fig.show='hide'}
+ x <- 0:5
+ x <- rep(x, rep(2, length(x)))
+    plot(x[-1], pbinom(x, 5,0.2)[-length(x)], xlab="x", ylab="probabilidad",
+     main="Función de distribución, Bi(5,0.2)", type="l")
+  abline(h=0, col="gray")
+ remove(x)
+```
+
+Análogamente en el caso de funciones contínuas como una distrubución $N(50,10)$:
+
+  - Función de densidad
+```{r fdennorm, results='hide', fig.show='hide'}
+ x <- seq(10,90 , length=100)
+    plot(x, dnorm(x, mean=50, sd=10), xlab="x", ylab="densidad",
+  main="Normal(mu=50, sigma=10)", type="l")
+ abline(h=0, col="gray")
+ remove(x)
+```
+  - Función de distribución: 
+```{r fdistnorm, results='hide', fig.show='hide'}
+ x <- seq(10, 90, length=100)
+    plot(x, pnorm(x, mean=50, sd=10), xlab="x", ylab="probabilidad",
+  main="Normal(mu=50, sigma=10)", type="l")
+ abline(h=0, col="gray")
+ remove(x)
+```
+
+**Ejercicio 1.** En un estudio con ratas de laboratorio se rechazan todas aquellas que pesan menos de 36 gramos. Si el peso sigue una distribución Normal con $\mu= 40$  y $\sigma=5$,
+\begin{itemize}
+  \item[a.] ¿Qué porcentaje de ratas rechazaremos?
+	\item[b.] Supongamos que se escogen 4 ratas al azar: 
+	\begin{itemize}
+		\item[(i)] ¿cuál es la probabilidad que se rechacen al menos dos de ellas?
+		\item[(ii)] ¿cuál es la probabilida que el peso medio de ellas sea menor a 36 gramos?
+	\end{itemize}
+	\item[c.] Dibuja las funciones de probabilidad/densidad y distribución de las variables aleatorias del problema.
+\end{itemize}
+
+_Respuesta:_
+
+_Apartado a_
+```{r}
+pnorm(36,40,5)*100
+```
+
+_Apartado b.1_
+```{r}
+pbinom(1, 4, pnorm(36,40,5), lower.tail = FALSE)
+```
+_Apartado b.2_
+
+Emplearemos que si $X_i\sim N(\mu_i, \sigma_i)$ y $\alpha_i \in \mathbb{R}$, $i=1,2,...n$ entonces $$Y=\sum_{i=1}^n \alpha_ix_i\sim N\left(\sum_{i=1}^n \alpha_i \mu_i, \sqrt{\sum_{i=1}^n\alpha_i^2\sigma_i^2}\right)$$
+Por lo tanto, la media que estamos estudiando seguirá una distribución $$\frac{1}{4}(X_1+X_2+X_3+X_4)\sim N\left(\frac{1}{4}\cdot 4\cdot 40, \sqrt{\sum_{i=1}^4 \frac{1}{4^2}\cdot 5^2}\right)=N\left(40, \frac{5}{2}\right)$$
+
+```{r}
+pnorm(36, mean=40, sd=5/2)
+```
+
+_Apartado c_
+
+```{r}
+x<-seq(20, 60, 0.1)
+z<-0:4
+zlargo<-rep(z, rep(2, length(z)))
+
+plot(x, dnorm(x, mean=40, sd=5), type="l", ylim=c(0,1), ylab="", col="red", main="Densidad de N(40,5)")
+
+plot(x, pnorm(x, mean=40, sd=5), type="l", ylim=c(0,1), ylab="", col="red", main="Distribución de N(40,5)")
+
+plot(z, dbinom(z, size=4, prob=pnorm(36,40,5)), ylim=c(0,1), ylab="", main="Densidad de Bin(4,0.2118554)", type="h")
+points(z, dbinom(z, 4, pnorm(36,40,5)), pch=16)
+abline(h=0, col="gray")
+
+plot(zlargo[-1], pbinom(zlargo, size=4, prob=pnorm(36,40,5))[-length(zlargo)], ylim=c(0,1), ylab="", main="Distribución de Bin(4,0.2118554)", type="l")
+abline(h=0, col="gray")
+
+plot(x, dnorm(x, mean=40, sd=5/2), type="l", ylim=c(0,1), ylab="", col="red", main="Densidad de N(40,5/2)")
+
+plot(x, pnorm(x, mean=40, sd=5/2), type="l", ylim=c(0,1), ylab="", col="red", main="Distribución de N(40,5/2)")
+```
+
+# 2. Muestras y población
+
+**Ejercicio 2.** Genera 100, 500, 1000, 5000 observaciones de una población $N(0,1)$. Dibuja el histograma de cada una de ellas. Y añade en cada una de ellas la gráfica de la función de densidad de $N(0,1)$. Calcula la media y desviación típica de cada una de las muestras generadas y compáralas con la media y desviación típica poblacional. Razona qué observas. 
+
+```{r}
+a<-rnorm(100)
+b<-rnorm(500)
+c<-rnorm(1000)
+d<-rnorm(5000)
+e<-rnorm(1000000)
+
+hist(a, freq=FALSE, ylim=c(0,1))
+lines(density(e), lwd=2, col="red")
+
+hist(b, freq=FALSE, ylim=c(0,1))
+lines(density(e), lwd=2, col="red")
+
+hist(c, freq=FALSE, ylim=c(0,1))
+lines(density(e), lwd=2, col="red")
+
+hist(d, freq=FALSE, ylim=c(0,1))
+lines(density(e), lwd=2, col="red")
+
+Media<-sapply(list(a,b,c,d), mean)
+Desviacion<-sapply(list(a,b,c,d), sd)
+g<-rbind(Media,Desviacion)
+colnames(g)<-c("100", "500", "1000", "5000")
+g
+```
+
+_Respuesta: observamos cómo va convergiendo la media hacia el valor 0 y la desviación típica hacia 1 a medida que el tamaño de la muestra va aumentando, como era de esperar._
+
+

@@ -1,0 +1,6 @@
+"0","library(ggplot2)"
+"0","ggplot(kc_tax0, (aes(x=dimension, y=tasa_impuestos))) +"
+"0","stat_binhex(colour=""blue"") +"
+"0","theme_bw() +"
+"0","scale_fill_gradient(low=""white"", high=""blue"") +"
+"0","labs(x=""dimensi?n (pies cuadrados)"", y=""tasa de impuestos"")"

@@ -1,0 +1,3 @@
+"0","fitval_mult <- fitted(fitSerie_ts_mult)  "
+"0",""
+"0","plot(fitSerie_ts_mult,ylab=""paro"",main=""Ajuste HW multiplicativo"")"

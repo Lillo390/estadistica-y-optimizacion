@@ -1,0 +1,5 @@
+"0","par(mfrow=c(2,4))"
+"0",""
+"0","hist_info1 <- hist(muestras_diversas$MUESTRA1, plot = FALSE)# Store output of hist function"
+"0","hist_info1$density<- hist_info1$counts/sum(hist_info1$counts)*100    # Compute density values "
+"0","plot(hist_info1, freq = FALSE, ylab=""Porcentaje"")# Plot histogram with percentages"
